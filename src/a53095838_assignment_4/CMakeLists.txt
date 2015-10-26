@@ -186,3 +186,9 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+add_executable(motion_keyboard src/motion_node_keyboard.cpp)
+target_link_libraries(motion_keyboard ${catkin_LIBRARIES})
+add_executable(motion src/motion_node.cpp)
+target_link_libraries(motion ${catkin_LIBRARIES})

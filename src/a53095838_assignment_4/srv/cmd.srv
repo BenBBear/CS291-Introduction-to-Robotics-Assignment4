@@ -1,4 +1,3 @@
-int8 processing_mode
-int8 visual_mode
+int8 mode
 ---
 bool success
