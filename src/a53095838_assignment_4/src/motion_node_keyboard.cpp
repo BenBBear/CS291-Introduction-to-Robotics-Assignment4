@@ -36,7 +36,7 @@ int main(int argc, char **argv){
         if(change_mode(client, mode)){
             cout<<"Mode changed successfully";
         }else{
-            cout<<"Mode change failed, there is bug in the program";
+            cout<<"Mode change failed";
         }
         cout<<"\n-------------------------";
     }

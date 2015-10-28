@@ -9,6 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  cv_bridge
+  image_geometry
+  image_transport 
 )
 
 ## System dependencies are found with CMake's conventions
@@ -186,9 +189,16 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
+find_package(OpenCV)
+include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(include ${catkin_INCLUDE_DIRS})
+
 add_executable(motion_keyboard src/motion_node_keyboard.cpp)
-target_link_libraries(motion_keyboard ${catkin_LIBRARIES})
 add_executable(motion src/motion_node.cpp)
-target_link_libraries(motion ${catkin_LIBRARIES})
+
+
+target_link_libraries(motion_keyboard ${catkin_LIBRARIES})
+target_link_libraries(motion ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+
+
