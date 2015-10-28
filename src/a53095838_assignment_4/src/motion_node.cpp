@@ -4,11 +4,10 @@
 
 Control_Type mode = Control_Val_MOG2;
 
-void mog2_md(cv::Mat fore, cv::Mat origin){
-    // impement motion detection here, based on that blog
-    // should be done
+void mog2_md(cv::Mat fore, cv::Mat origin)
+{
     cv::imshow("view", fore);
-    
+	
 }
 
 
@@ -18,12 +17,20 @@ void fb_md(cv::Mat flow, cv::Mat origin){
 
 
 cv::BackgroundSubtractorMOG2 bg;
-void mog2(cv::Mat image){
+void mog2(cv::Mat image)
+{
     cv::Mat fore;
     cv::Mat back;
+	cv::Mat morph;
     bg.operator()(image,fore);
     bg.getBackgroundImage (back);
-    mog2_md(fore,image);
+
+	cv::Size kernel_size(25, 25);
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, kernel_size);
+	cv::erode(fore, morph, kernel);
+	cv::dilate(morph, fore, kernel);
+
+    mog2_md(fore, image);
 }
 
 // static void drawOptFlowMap(const cv::Mat& flow, cv::Mat& cflowmap, int step,
