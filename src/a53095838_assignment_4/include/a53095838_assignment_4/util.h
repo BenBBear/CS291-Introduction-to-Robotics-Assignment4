@@ -12,6 +12,7 @@ using namespace std;
 #define Image_channel "/camera/visible/image"
 #define Control_channel "/processing_mode"
 
+#define Control_Val_EXIT 0
 #define Control_Val_RAW 1
 #define Control_Val_Farneback 2
 #define Control_Val_MOG2 3
