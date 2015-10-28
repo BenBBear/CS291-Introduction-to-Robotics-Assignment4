@@ -12,10 +12,10 @@ using namespace std;
 #define Image_channel "/camera/visible/image"
 #define Control_channel "/processing_mode"
 
-#define Control_Val_RAW 0
-#define Control_Val_Farneback 1
-#define Control_Val_MOG2 2
+#define Control_Val_RAW 1
+#define Control_Val_Farneback 2
+#define Control_Val_MOG2 3
 
-#define Control_Type int8;
+#define Control_Type int8_t
 
 #endif /* UTIL_HEADER_FILE */

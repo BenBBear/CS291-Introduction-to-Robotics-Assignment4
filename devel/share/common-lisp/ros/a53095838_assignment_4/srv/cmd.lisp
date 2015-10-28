@@ -7,14 +7,9 @@
 ;//! \htmlinclude cmd-request.msg.html
 
 (cl:defclass <cmd-request> (roslisp-msg-protocol:ros-message)
-  ((processing_mode
-    :reader processing_mode
-    :initarg :processing_mode
-    :type cl:fixnum
-    :initform 0)
-   (visual_mode
-    :reader visual_mode
-    :initarg :visual_mode
+  ((mode
+    :reader mode
+    :initarg :mode
     :type cl:fixnum
     :initform 0))
 )
@@ -27,21 +22,13 @@
   (cl:unless (cl:typep m 'cmd-request)
     (roslisp-msg-protocol:msg-deprecation-warning "using old message class name a53095838_assignment_4-srv:<cmd-request> is deprecated: use a53095838_assignment_4-srv:cmd-request instead.")))
 
-(cl:ensure-generic-function 'processing_mode-val :lambda-list '(m))
-(cl:defmethod processing_mode-val ((m <cmd-request>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader a53095838_assignment_4-srv:processing_mode-val is deprecated.  Use a53095838_assignment_4-srv:processing_mode instead.")
-  (processing_mode m))
-
-(cl:ensure-generic-function 'visual_mode-val :lambda-list '(m))
-(cl:defmethod visual_mode-val ((m <cmd-request>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader a53095838_assignment_4-srv:visual_mode-val is deprecated.  Use a53095838_assignment_4-srv:visual_mode instead.")
-  (visual_mode m))
+(cl:ensure-generic-function 'mode-val :lambda-list '(m))
+(cl:defmethod mode-val ((m <cmd-request>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader a53095838_assignment_4-srv:mode-val is deprecated.  Use a53095838_assignment_4-srv:mode instead.")
+  (mode m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <cmd-request>) ostream)
   "Serializes a message object of type '<cmd-request>"
-  (cl:let* ((signed (cl:slot-value msg 'processing_mode)) (unsigned (cl:if (cl:< signed 0) (cl:+ signed 256) signed)))
-    (cl:write-byte (cl:ldb (cl:byte 8 0) unsigned) ostream)
-    )
-  (cl:let* ((signed (cl:slot-value msg 'visual_mode)) (unsigned (cl:if (cl:< signed 0) (cl:+ signed 256) signed)))
+  (cl:let* ((signed (cl:slot-value msg 'mode)) (unsigned (cl:if (cl:< signed 0) (cl:+ signed 256) signed)))
     (cl:write-byte (cl:ldb (cl:byte 8 0) unsigned) ostream)
     )
 )
@@ -49,10 +36,7 @@
   "Deserializes a message object of type '<cmd-request>"
     (cl:let ((unsigned 0))
       (cl:setf (cl:ldb (cl:byte 8 0) unsigned) (cl:read-byte istream))
-      (cl:setf (cl:slot-value msg 'processing_mode) (cl:if (cl:< unsigned 128) unsigned (cl:- unsigned 256))))
-    (cl:let ((unsigned 0))
-      (cl:setf (cl:ldb (cl:byte 8 0) unsigned) (cl:read-byte istream))
-      (cl:setf (cl:slot-value msg 'visual_mode) (cl:if (cl:< unsigned 128) unsigned (cl:- unsigned 256))))
+      (cl:setf (cl:slot-value msg 'mode) (cl:if (cl:< unsigned 128) unsigned (cl:- unsigned 256))))
   msg
 )
 (cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<cmd-request>)))
@@ -63,26 +47,24 @@
   "a53095838_assignment_4/cmdRequest")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<cmd-request>)))
   "Returns md5sum for a message object of type '<cmd-request>"
-  "0e3bb1977c0401bcd0b9d7f3bcbaee05")
+  "5da578ca824a6682cf704b593bb1a59e")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'cmd-request)))
   "Returns md5sum for a message object of type 'cmd-request"
-  "0e3bb1977c0401bcd0b9d7f3bcbaee05")
+  "5da578ca824a6682cf704b593bb1a59e")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<cmd-request>)))
   "Returns full string definition for message of type '<cmd-request>"
-  (cl:format cl:nil "int8 processing_mode~%int8 visual_mode~%~%~%"))
+  (cl:format cl:nil "int8 mode~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'cmd-request)))
   "Returns full string definition for message of type 'cmd-request"
-  (cl:format cl:nil "int8 processing_mode~%int8 visual_mode~%~%~%"))
+  (cl:format cl:nil "int8 mode~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <cmd-request>))
   (cl:+ 0
-     1
      1
 ))
 (cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <cmd-request>))
   "Converts a ROS message object to a list"
   (cl:list 'cmd-request
-    (cl:cons ':processing_mode (processing_mode msg))
-    (cl:cons ':visual_mode (visual_mode msg))
+    (cl:cons ':mode (mode msg))
 ))
 ;//! \htmlinclude cmd-response.msg.html
 
@@ -123,10 +105,10 @@
   "a53095838_assignment_4/cmdResponse")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<cmd-response>)))
   "Returns md5sum for a message object of type '<cmd-response>"
-  "0e3bb1977c0401bcd0b9d7f3bcbaee05")
+  "5da578ca824a6682cf704b593bb1a59e")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'cmd-response)))
   "Returns md5sum for a message object of type 'cmd-response"
-  "0e3bb1977c0401bcd0b9d7f3bcbaee05")
+  "5da578ca824a6682cf704b593bb1a59e")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<cmd-response>)))
   "Returns full string definition for message of type '<cmd-response>"
   (cl:format cl:nil "bool success~%~%~%~%"))

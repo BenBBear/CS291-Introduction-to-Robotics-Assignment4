@@ -7,7 +7,7 @@
         <remap from = "camera/image_raw" to = "camera/visible/image" />
     </node>
     <!-- listen to camera visible image -->
-    <node pkg ="a53095838_assignment_4"  type="motion_keyboard"  name="motion_keyboard" />
+    <node pkg ="a53095838_assignment_4"  type="motion_keyboard"  name="motion_keyboard" output="screen" />
     
-    <node pkg ="a53095838_assignment_4"  type="motion"  name="motion" />
+    <node pkg ="a53095838_assignment_4"  type="motion"  name="motion" output="screen" />
 </launch>

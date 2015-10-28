@@ -24,21 +24,16 @@ struct cmdRequest_
   typedef cmdRequest_<ContainerAllocator> Type;
 
   cmdRequest_()
-    : processing_mode(0)
-    , visual_mode(0)  {
+    : mode(0)  {
     }
   cmdRequest_(const ContainerAllocator& _alloc)
-    : processing_mode(0)
-    , visual_mode(0)  {
+    : mode(0)  {
     }
 
 
 
-   typedef int8_t _processing_mode_type;
-  _processing_mode_type processing_mode;
-
-   typedef int8_t _visual_mode_type;
-  _visual_mode_type visual_mode;
+   typedef int8_t _mode_type;
+  _mode_type mode;
 
 
 
@@ -117,12 +112,12 @@ struct MD5Sum< ::a53095838_assignment_4::cmdRequest_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "2868f204a047becc6c5862b92299816f";
+    return "418c02483a8ca57215fb7b31c5c87234";
   }
 
   static const char* value(const ::a53095838_assignment_4::cmdRequest_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x2868f204a047beccULL;
-  static const uint64_t static_value2 = 0x6c5862b92299816fULL;
+  static const uint64_t static_value1 = 0x418c02483a8ca572ULL;
+  static const uint64_t static_value2 = 0x15fb7b31c5c87234ULL;
 };
 
 template<class ContainerAllocator>
@@ -141,8 +136,7 @@ struct Definition< ::a53095838_assignment_4::cmdRequest_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "int8 processing_mode\n\
-int8 visual_mode\n\
+    return "int8 mode\n\
 ";
   }
 
@@ -161,8 +155,7 @@ namespace serialization
   {
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
-      stream.next(m.processing_mode);
-      stream.next(m.visual_mode);
+      stream.next(m.mode);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER;
@@ -181,10 +174,8 @@ struct Printer< ::a53095838_assignment_4::cmdRequest_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::a53095838_assignment_4::cmdRequest_<ContainerAllocator>& v)
   {
-    s << indent << "processing_mode: ";
-    Printer<int8_t>::stream(s, indent + "  ", v.processing_mode);
-    s << indent << "visual_mode: ";
-    Printer<int8_t>::stream(s, indent + "  ", v.visual_mode);
+    s << indent << "mode: ";
+    Printer<int8_t>::stream(s, indent + "  ", v.mode);
   }
 };
 
