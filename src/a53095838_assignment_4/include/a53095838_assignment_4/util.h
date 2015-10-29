@@ -12,6 +12,7 @@
 #include <sstream>
 #include "ros/ros.h"
 #include <vector>
+#include <cmath>
 
 using namespace std;
 #define Image_channel "/camera/visible/image"

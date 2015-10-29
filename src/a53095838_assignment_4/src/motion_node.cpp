@@ -44,33 +44,46 @@ void mog2(cv::Mat image)
     
 
     std::vector<std::vector<cv::Point> > contours;
+    std::vector<cv::Rect> rects;
     cv::Scalar color(255, 255, 255);
     cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
     cv::drawContours(buff1, contours, -1, color);
     for (uint i=0; i < contours.size(); i++) {
-        CvRect rect = cv::boundingRect(contours[i]);
-
+        cv::Rect rect = cv::boundingRect(contours[i]);
+        
         if(rect.width*rect.height> MOG2_THRESHOLD){
-            ROS_INFO("%d",rect.width*rect.height);
-        cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
+            // ROS_INFO("%d",rect.width*rect.height);
+            rects.push_back(rect);
+            cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
         }
     }
-    show(buff1);
-    cv::imshow("other",image);
+    // ROS_INFO("rects size = %d",rects.size());
+    // groupRectangles(rects, 3, 0.2);
+    // ROS_INFO("rects after group size = %d",rects.size());
+    // for (uint i=0; i < rects.size(); i++) {
+    //     ROS_INFO("32");
+    //     cv::Rect rect = rects[i];
+    //     cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
+        
+    // }
+    // show(buff1);
+    // cv::imshow("other",image);
+    show(image);
 }
 
-// static void drawOptFlowMap(const cv::Mat& flow, cv::Mat& cflowmap, int step,
-//                            double, const cv::Scalar& color)
-// {
-//     for(int y = 0; y < cflowmap.rows; y += step)
-//         for(int x = 0; x < cflowmap.cols; x += step)
-//         {
-//             const cv::Point2f& fxy = flow.at<cv::Point2f>(y, x);
-//             line(cflowmap, cv::Point(x,y), cv::Point(cvRound(x+fxy.x), cvRound(y+fxy.y)),
-//                  color);
-//             circle(cflowmap, cv::Point(x,y), 2, color, -1);
-//         }
-// }
+
+void drawBoundingBox(const cv::Mat& flow, cv::Mat& image,int step){
+    float threshold = 10;
+    for(int y = 0; y < image.rows; y += step)
+        for(int x = 0; x < image.cols; x += step)
+        {
+            const cv::Point2f& fxy = flow.at<cv::Point2f>(y, x);
+            float square_size = abs(fxy.x*fxy.y);
+            if(square_size > threshold){
+                cv::rectangle(image, cvPoint(x, y), cvPoint(x+fxy.x, y+fxy.y), cvScalar(0, 0, 255, 0), 2, 8, 0);
+            }            
+        }
+};
 
 
 cv::Mat prevgray;
@@ -82,8 +95,8 @@ void farneback(cv::Mat image){
         if(!prevgray.empty()){
             cv::calcOpticalFlowFarneback(prevgray,gray,goutput,0.5, 3, 15, 3, 5, 1.2, 0);
             cvtColor(prevgray, coutput, cv::COLOR_GRAY2BGR);
-            // drawOptFlowMap(goutput, coutput, 16, 1.5, cv::Scalar(0, 255, 0));
-            fb_md(goutput,image);
+            drawBoundingBox(goutput,image, 16);
+            show(image);            
         }
         swap(prevgray,gray);
     }catch(...){
@@ -132,13 +145,13 @@ int main(int argc, char **argv){
     cv::namedWindow("view");
     cv::startWindowThread();
 
-    cv::namedWindow("other");
-    cv::startWindowThread();
+    // cv::namedWindow("other");
+    // cv::startWindowThread();
 
     
     
     ros::spin();
     cv::destroyWindow("view");
-    cv::destroyWindow("other");
+    // cv::destroyWindow("other");
     return 0;
 }
