@@ -72,11 +72,12 @@ void mog2(cv::Mat image)
 
 }
 
-void applyRect(std::vector<cv::Rect*> rects, cv::Mat image){
+void applyRect(std::vector<cv::Rect*> rects, cv::Mat image,int step = 16){
     for(uint i = 0;i<rects.size();i++) {
         cv::Rect* rect = rects[i];
-        ROS_INFO("Rect (%d,%d) width = %d, height = %d",rect->x,rect->y,rect->width,rect->height);
-        cv::rectangle(image, cvPoint(rect->x, rect->y), cvPoint(rect->x+rect->width, rect->y+rect->height), cvScalar(0, 0, 255, 0), 2, 8, 0);        
+        // ROS_INFO("Rect (%d,%d) width = %d, height = %d",rect->x,rect->y,rect->width,rect->height);
+        if(rect->width > step || rect->height >step)
+            cv::rectangle(image, cvPoint(rect->x, rect->y), cvPoint(rect->x+rect->width, rect->y+rect->height), cvScalar(0, 0, 255, 0), 2, 8, 0);        
     }
 }
 
@@ -145,6 +146,8 @@ void genBox(std::vector<cv::Point2f> points,std::vector<cv::Rect*>& rects,int st
                 }
             }
             // ROS_INFO("    Max_Distance = %f",max_distance);
+            // ROS_INFO("    Max_Distance = %f",max_distance);
+            // ROS_INFO("    Neast width = %d, height = %d",nearst->width,nearst->height); 
             if(max_distance > d*step)
                 rects.push_back(new cv::Rect(p.x,p.y,step,step));
             else            
@@ -175,7 +178,7 @@ void drawBoundingBox(const cv::Mat& flow, cv::Mat& image,int step = 16,int d = 5
     // ROS_INFO("Get Rects %d",rects.size());        
     
     // draw box
-    applyRect(rects, image);
+    applyRect(rects, image,step);
     for(uint i = 0;i<rects.size();i++)
         delete rects[i];
 };
