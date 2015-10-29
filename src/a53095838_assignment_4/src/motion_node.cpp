@@ -1,6 +1,7 @@
 #include "../include/a53095838_assignment_4/util.h"
 #define FRAME(i,j) frame->data[j*frame->width+i]
 #define show(x) cv::imshow("view", x)
+#define MOG2_THRESHOLD 500
 
 Control_Type mode = Control_Val_MOG2;
 
@@ -21,11 +22,13 @@ void mog2(cv::Mat image)
 {
     //cv::Mat fore;
     cv::Mat back;
-	cv::Mat buff1;
-	cv::Mat buff2;
+    cv::Mat buff1;
+    cv::Mat buff2;
     bg.operator()(image, buff1);
+    bg.set("nmixtures",5);     
     bg.getBackgroundImage(back);
 
+<<<<<<< HEAD
 	cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
 	cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
 
@@ -49,20 +52,64 @@ void mog2(cv::Mat image)
 	}
 
 	mog2_md(image, image);
+=======
+    cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
+    cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
+
+    // cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
+    // cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
+
+        // cv::erode(buff1, buff2, erode_kernel);
+        // cv::erode(buff2, buff1, erode_kernel);
+        // cv::dilate(buff2, buff1, dilate_kernel);        
+        // cv::dilate(buff1, buff2, dilate_kernel);
+    
+
+    // cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2, 2));
+    
+
+    std::vector<std::vector<cv::Point> > contours;
+    std::vector<cv::Rect> rects;
+    cv::Scalar color(255, 255, 255);
+    cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+    cv::drawContours(buff1, contours, -1, color);
+    for (uint i=0; i < contours.size(); i++) {
+        cv::Rect rect = cv::boundingRect(contours[i]);
+        
+        if(rect.width*rect.height> MOG2_THRESHOLD){
+            // ROS_INFO("%d",rect.width*rect.height);
+            rects.push_back(rect);
+            cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
+        }
+    }
+    // ROS_INFO("rects size = %d",rects.size());
+    // groupRectangles(rects, 3, 0.2);
+    // ROS_INFO("rects after group size = %d",rects.size());
+    // for (uint i=0; i < rects.size(); i++) {
+    //     ROS_INFO("32");
+    //     cv::Rect rect = rects[i];
+    //     cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
+        
+    // }
+    // show(buff1);
+    // cv::imshow("other",image);
+    show(image);
+>>>>>>> origin
 }
 
-// static void drawOptFlowMap(const cv::Mat& flow, cv::Mat& cflowmap, int step,
-//                            double, const cv::Scalar& color)
-// {
-//     for(int y = 0; y < cflowmap.rows; y += step)
-//         for(int x = 0; x < cflowmap.cols; x += step)
-//         {
-//             const cv::Point2f& fxy = flow.at<cv::Point2f>(y, x);
-//             line(cflowmap, cv::Point(x,y), cv::Point(cvRound(x+fxy.x), cvRound(y+fxy.y)),
-//                  color);
-//             circle(cflowmap, cv::Point(x,y), 2, color, -1);
-//         }
-// }
+
+void drawBoundingBox(const cv::Mat& flow, cv::Mat& image,int step){
+    float threshold = 10;
+    for(int y = 0; y < image.rows; y += step)
+        for(int x = 0; x < image.cols; x += step)
+        {
+            const cv::Point2f& fxy = flow.at<cv::Point2f>(y, x);
+            float square_size = abs(fxy.x*fxy.y);
+            if(square_size > threshold){
+                cv::rectangle(image, cvPoint(x, y), cvPoint(x+fxy.x, y+fxy.y), cvScalar(0, 0, 255, 0), 2, 8, 0);
+            }            
+        }
+};
 
 
 cv::Mat prevgray;
@@ -74,8 +121,8 @@ void farneback(cv::Mat image){
         if(!prevgray.empty()){
             cv::calcOpticalFlowFarneback(prevgray,gray,goutput,0.5, 3, 15, 3, 5, 1.2, 0);
             cvtColor(prevgray, coutput, cv::COLOR_GRAY2BGR);
-            // drawOptFlowMap(goutput, coutput, 16, 1.5, cv::Scalar(0, 255, 0));
-            fb_md(goutput,image);
+            drawBoundingBox(goutput,image, 16);
+            show(image);            
         }
         swap(prevgray,gray);
     }catch(...){
@@ -119,9 +166,18 @@ int main(int argc, char **argv){
     ros::ServiceServer service = n.advertiseService(Control_channel, control_callback);
     ros::Subscriber gscam_sub = n.subscribe(Image_channel, 1, gscam_callback);
 
+    
+    
     cv::namedWindow("view");
     cv::startWindowThread();
+
+    // cv::namedWindow("other");
+    // cv::startWindowThread();
+
+    
+    
     ros::spin();
     cv::destroyWindow("view");
+    // cv::destroyWindow("other");
     return 0;
 }
