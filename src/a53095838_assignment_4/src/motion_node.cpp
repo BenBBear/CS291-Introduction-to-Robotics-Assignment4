@@ -16,21 +16,33 @@ void fb_md(cv::Mat flow, cv::Mat origin){
 }
 
 
-cv::BackgroundSubtractorMOG2 bg;
+cv::BackgroundSubtractorMOG2 bg(4,16.0f);
 void mog2(cv::Mat image)
 {
-    cv::Mat fore;
+    //cv::Mat fore;
     cv::Mat back;
-	cv::Mat morph;
-    bg.operator()(image,fore);
-    bg.getBackgroundImage (back);
+	cv::Mat buff1;
+	cv::Mat buff2;
+    bg.operator()(image, buff1);
+    bg.getBackgroundImage(back);
 
-	cv::Size kernel_size(25, 25);
-	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, kernel_size);
-	cv::erode(fore, morph, kernel);
-	cv::dilate(morph, fore, kernel);
+	cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
+	cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
 
-    mog2_md(fore, image);
+//	cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
+//	cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
+
+//	cv::erode(buff1, buff2, erode_kernel);
+//	cv::dilate(buff2, buff1, dilate_kernel);
+//	cv::dilate(buff1, buff2, dilate_kernel);
+//	cv::erode(buff2, buff1, erode_kernel);
+
+	std::vector<std::vector<cv::Point> > contours;
+	cv::Scalar color(255, 255, 255);
+	cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+	cv::drawContours(buff1, contours, -1, color);
+
+    mog2_md(buff1, image);
 }
 
 // static void drawOptFlowMap(const cv::Mat& flow, cv::Mat& cflowmap, int step,
