@@ -1,6 +1,7 @@
 #include "../include/a53095838_assignment_4/util.h"
 #define FRAME(i,j) frame->data[j*frame->width+i]
 #define show(x) cv::imshow("view", x)
+#define MOG2_THRESHOLD 500
 
 Control_Type mode = Control_Val_MOG2;
 
@@ -21,28 +22,41 @@ void mog2(cv::Mat image)
 {
     //cv::Mat fore;
     cv::Mat back;
-	cv::Mat buff1;
-	cv::Mat buff2;
+    cv::Mat buff1;
+    cv::Mat buff2;
     bg.operator()(image, buff1);
+    bg.set("nmixtures",5);     
     bg.getBackgroundImage(back);
 
-	cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
-	cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
+    cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
+    cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
 
-//	cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
-//	cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
+    // cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
+    // cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
 
-//	cv::erode(buff1, buff2, erode_kernel);
-//	cv::dilate(buff2, buff1, dilate_kernel);
-//	cv::dilate(buff1, buff2, dilate_kernel);
-//	cv::erode(buff2, buff1, erode_kernel);
+        // cv::erode(buff1, buff2, erode_kernel);
+        // cv::erode(buff2, buff1, erode_kernel);
+        // cv::dilate(buff2, buff1, dilate_kernel);        
+        // cv::dilate(buff1, buff2, dilate_kernel);
+    
 
-	std::vector<std::vector<cv::Point> > contours;
-	cv::Scalar color(255, 255, 255);
-	cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-	cv::drawContours(buff1, contours, -1, color);
+    // cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2, 2));
+    
 
-    mog2_md(buff1, image);
+    std::vector<std::vector<cv::Point> > contours;
+    cv::Scalar color(255, 255, 255);
+    cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+    cv::drawContours(buff1, contours, -1, color);
+    for (uint i=0; i < contours.size(); i++) {
+        CvRect rect = cv::boundingRect(contours[i]);
+
+        if(rect.width*rect.height> MOG2_THRESHOLD){
+            ROS_INFO("%d",rect.width*rect.height);
+        cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
+        }
+    }
+    show(buff1);
+    cv::imshow("other",image);
 }
 
 // static void drawOptFlowMap(const cv::Mat& flow, cv::Mat& cflowmap, int step,
@@ -113,9 +127,18 @@ int main(int argc, char **argv){
     ros::ServiceServer service = n.advertiseService(Control_channel, control_callback);
     ros::Subscriber gscam_sub = n.subscribe(Image_channel, 1, gscam_callback);
 
+    
+    
     cv::namedWindow("view");
     cv::startWindowThread();
+
+    cv::namedWindow("other");
+    cv::startWindowThread();
+
+    
+    
     ros::spin();
     cv::destroyWindow("view");
+    cv::destroyWindow("other");
     return 0;
 }
