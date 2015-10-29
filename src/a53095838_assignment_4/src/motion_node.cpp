@@ -220,7 +220,7 @@ void farneback(cv::Mat image){
         if(!prevgray.empty()){
             cv::calcOpticalFlowFarneback(prevgray,gray,goutput,0.5, 3, 15, 3, 5, 1.2, 0);
             // cvtColor(prevgray, coutput, cv::COLOR_GRAY2BGR);
-            drawBoundingBox(goutput, image,16,10);
+            drawBoundingBox(goutput, image,16,8);
             // flow2speed(goutput, speed);
             // kmeans(goutput,image);
             // show(speed);
