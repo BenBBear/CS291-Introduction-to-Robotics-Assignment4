@@ -89,28 +89,48 @@ bool allContains(std::vector<cv::Rect> rects,cv::Point2f point){
     return false;
 }
 
-float distance_rect_point(cv::Point2f p,cv::Rect r){
-    return max(p.x - r.x - r.width, p.y - r.y - r.height);
+float distance_rect_point(cv::Point2f p,cv::Rect r){    
+    float cx = r.x + r.width/2, cy = r.y + r.height/2;
+    // ROS_INFO("    (cx = %f, cy = %f)",cx,cy);
+    float re = sqrt(pow(cx-p.x,2) + pow(cy-p.y,2));
+    // ROS_INFO("    distance_rect_point = %f",re);
+    return re;
 }
 
-void add_to_rect(cv::Rect nearst, cv::Point2f p){
+void add_to_rect(cv::Rect& nearst, cv::Point2f p){
     if(p.x > nearst.x + nearst.width){
+        // ROS_INFO("        add_to_rect 1");
         nearst.width = p.x - nearst.x + 1;
     }
     if(p.y > nearst.y + nearst.height){
+        // ROS_INFO("        add_to_rect 2");
         nearst.height = p.y - nearst.y + 1;
-    }    
+    }
+    if(p.x < nearst.x){
+        // ROS_INFO("        add_to_rect 3");
+        nearst.width = nearst.width + nearst.x - p.x +1;
+        nearst.x = p.x;
+    }
+    if(p.y < nearst.y){
+        // ROS_INFO("        add_to_rect 4");
+        nearst.height = nearst.height + nearst.y - p.y +1;
+        nearst.y = p.y;
+    }
 }
 
-#define ADD_RECT() rects.push_back(cv::Rect(p.x,p.y,step,step))
-void genBox(std::vector<cv::Point2f> points,std::vector<cv::Rect> rects,int step=16,int d = 5){
+
+void genBox(std::vector<cv::Point2f> points,std::vector<cv::Rect>& rects,int step=16,int d = 5){
     for(uint i = 0;i<points.size();i++){
+        
+        // ROS_INFO("    rects size %d",rects.size());        
         cv::Point2f p = points[i];
+        // ROS_INFO("    point is (%f,%f)",p.x,p.y);
         if(rects.empty()){
-            ADD_RECT();
+            rects.push_back(cv::Rect(p.x,p.y,step,step));
         }else{
             // group contains
             if(allContains(rects, p)){
+                // ROS_INFO("    continue");
                 continue;
             }
             cv::Rect nearst;
@@ -123,8 +143,12 @@ void genBox(std::vector<cv::Point2f> points,std::vector<cv::Rect> rects,int step
                     nearst = rect;
                 }
             }
+            // ROS_INFO("    Max_Distance = %f",max_distance);
+            // if(max_distance > 3*step)
+            //     rects.push_back(cv::Rect(p.x,p.y,step,step));
+            // else            
             add_to_rect(nearst, p);
-            
+            // ROS_INFO("    Neast Width %d, Height %d",nearst.width, nearst.height);
         }
     }
 }
@@ -139,12 +163,15 @@ void drawBoundingBox(const cv::Mat& flow, cv::Mat& image,int step = 16,int d = 5
             const cv::Point2f& p = flow.at<cv::Point2f>(y, x);
             float square_size = abs(p.x*p.y);
             if(square_size > threshold){                
-                // cv::rectangle(image, cvPoint(x, y), cvPoint(x+fxy.x, y+fxy.y), cvScalar(0, 0, 255, 0), 2, 8, 0);
-                points.push_back(p);
+                points.push_back(cv::Point2f(x,y));
             }            
         }
     // generate box
-    genBox(points,rects,step,d);
+    // ROS_INFO("Get Points %d",points.size()); //ok
+    genBox(points,rects,step);
+    ROS_INFO("Get Rects %d",rects.size());    
+    
+    // ROS_INFO("    Neast Width %d, Height %d",rects[0].width, rects[0].height);
     // draw box
     applyRect(rects, image);
 };
