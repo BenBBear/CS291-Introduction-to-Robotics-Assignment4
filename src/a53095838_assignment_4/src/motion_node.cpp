@@ -28,11 +28,11 @@ void mog2(cv::Mat image)
     bg.set("nmixtures",5);     
     bg.getBackgroundImage(back);
 
-<<<<<<< HEAD
+// <<<<<<< HEAD
 	cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
 	cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
 
-	cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_, cv::Size(11, 11));
+	cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
 	cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
 
 	cv::erode(buff1, buff2, erode_kernel);
@@ -51,50 +51,26 @@ void mog2(cv::Mat image)
 		cv::rectangle(image, boundingRects[i], color, 2, 8, 0);
 	}
 
-	mog2_md(image, image);
-=======
-    cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
-    cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
-
-    // cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
-    // cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
-
-        // cv::erode(buff1, buff2, erode_kernel);
-        // cv::erode(buff2, buff1, erode_kernel);
-        // cv::dilate(buff2, buff1, dilate_kernel);        
-        // cv::dilate(buff1, buff2, dilate_kernel);
-    
-
-    // cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2, 2));
-    
-
-    std::vector<std::vector<cv::Point> > contours;
-    std::vector<cv::Rect> rects;
-    cv::Scalar color(255, 255, 255);
-    cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-    cv::drawContours(buff1, contours, -1, color);
-    for (uint i=0; i < contours.size(); i++) {
-        cv::Rect rect = cv::boundingRect(contours[i]);
+	show(image);
+// =======
+    // cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
+    // cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
+    // std::vector<std::vector<cv::Point> > contours;
+    // std::vector<cv::Rect> rects;
+    // cv::Scalar color(255, 255, 255);
+    // cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+    // cv::drawContours(buff1, contours, -1, color);
+    // for (uint i=0; i < contours.size(); i++) {
+    //     cv::Rect rect = cv::boundingRect(contours[i]);
         
-        if(rect.width*rect.height> MOG2_THRESHOLD){
-            // ROS_INFO("%d",rect.width*rect.height);
-            rects.push_back(rect);
-            cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
-        }
-    }
-    // ROS_INFO("rects size = %d",rects.size());
-    // groupRectangles(rects, 3, 0.2);
-    // ROS_INFO("rects after group size = %d",rects.size());
-    // for (uint i=0; i < rects.size(); i++) {
-    //     ROS_INFO("32");
-    //     cv::Rect rect = rects[i];
-    //     cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
-        
+    //     if(rect.width*rect.height> MOG2_THRESHOLD){
+    //         // ROS_INFO("%d",rect.width*rect.height);
+    //         rects.push_back(rect);
+    //         cv::rectangle(image, cvPoint(rect.x, rect.y), cvPoint(rect.x+rect.width, rect.y+rect.height), cvScalar(0, 0, 255, 0), 2, 8, 0);
+    //     }
     // }
-    // show(buff1);
-    // cv::imshow("other",image);
-    show(image);
->>>>>>> origin
+    // show(image);
+
 }
 
 
@@ -121,7 +97,7 @@ void farneback(cv::Mat image){
         if(!prevgray.empty()){
             cv::calcOpticalFlowFarneback(prevgray,gray,goutput,0.5, 3, 15, 3, 5, 1.2, 0);
             cvtColor(prevgray, coutput, cv::COLOR_GRAY2BGR);
-            drawBoundingBox(goutput,image, 16);
+            drawBoundingBox(goutput,image, 32);
             show(image);            
         }
         swap(prevgray,gray);
