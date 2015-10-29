@@ -29,20 +29,26 @@ void mog2(cv::Mat image)
 	cv::GaussianBlur(buff1, buff2, cv::Size(9, 9), 0, 0);
 	cv::threshold(buff2, buff1, 64, 255, cv::THRESH_BINARY);
 
-//	cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
-//	cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
+	cv::Mat erode_kernel = cv::getStructuringElement(cv::MORPH_, cv::Size(11, 11));
+	cv::Mat dilate_kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11, 11));
 
-//	cv::erode(buff1, buff2, erode_kernel);
-//	cv::dilate(buff2, buff1, dilate_kernel);
-//	cv::dilate(buff1, buff2, dilate_kernel);
-//	cv::erode(buff2, buff1, erode_kernel);
+	cv::erode(buff1, buff2, erode_kernel);
+	cv::dilate(buff2, buff1, dilate_kernel);
 
 	std::vector<std::vector<cv::Point> > contours;
 	cv::Scalar color(255, 255, 255);
-	cv::findContours(buff1, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-	cv::drawContours(buff1, contours, -1, color);
+	cv::findContours(buff1, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+//	cv::drawContours(buff1, contours, -1, color);
 
-    mog2_md(buff1, image);
+	std::vector<cv::Rect> boundingRects(contours.size());
+
+	for (int i = 0 ;i < contours.size(); ++i)
+	{
+		boundingRects[i] = cv::boundingRect(contours[i]);	
+		cv::rectangle(image, boundingRects[i], color, 2, 8, 0);
+	}
+
+	mog2_md(image, image);
 }
 
 // static void drawOptFlowMap(const cv::Mat& flow, cv::Mat& cflowmap, int step,
